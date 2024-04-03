@@ -2,10 +2,42 @@
   "name": "matts-llm-tools",
   "module": "index.ts",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.0.2",
+  "description": "Some useful tools for working with LLMs",
+  "scripts": {
+    "build": "bun build --target=node ./src/index.ts --outfile=dist/index.js && bun run build:declaration",
+    "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
+    "postbuild": "rimraf tsconfig.types.tsbuildinfo"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "rimraf": "^5.0.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/technovangelist/matts-llm-tools.git"
+  },
+  "keywords": [
+    "Ollama",
+    "LLM",
+    "technovangelist",
+    "youtube"
+  ],
+  "author": "Matthew Williams",
+  "license": "MIT",
+  "files": [
+    "dist/*.js",
+    "dist/*.d.ts"
+  ],
+  "dependencies": {
+    "@stdlib/nlp-sentencize": "^0.2.1",
+    "fs": "^0.0.1-security",
+    "glob": "^10.3.10",
+    "path": "^0.12.7"
   }
 }
