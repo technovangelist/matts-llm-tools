@@ -1,4 +1,7 @@
 import fs from 'fs';
+import ollama from 'ollama';
+import Hex from 'hex-encoding';
+import {createHash} from 'crypto';
 
 import sentencize from "@stdlib/nlp-sentencize";
 
@@ -49,4 +52,40 @@ export function chunkTextBySentences(sourceText: string, sentencesPerChunk: numb
   }
 
   return chunks;
+}
+
+export async function latestModelGetter(modelName: string): Promise<void> {
+  let [repo, tag] = modelName.split(":");
+  const localModels = (await ollama.list()).models.map(m => ({ "name": m.name, "digest": m.digest }));
+
+  if (!repo.includes("/")) {
+    repo = `library/${repo}`;
+  }
+  const localdigest = localModels.find(m => m.name === modelName)?.digest;
+  if (localdigest) {
+    const remoteModelInfo = await fetch(`https://ollama.ai/v2/${repo}/manifests/${tag}`, {
+      headers: {
+        "Accept": "application/vnd.docker.distribution.manifest.v2+json"
+      }
+    })
+    if (remoteModelInfo.status === 200) {
+      const remoteModelInfoJson = await remoteModelInfo.json();
+      const hash = await jsonhash(remoteModelInfoJson as string);
+      if (localdigest !== hash) {
+        await ollama.pull({model: modelName, stream: false})
+      }
+    }
+  } else {
+    await ollama.pull({model: modelName, stream: false})
+  }
+
+}
+
+export async function jsonhash(json: string) {
+  const jsonstring = JSON.stringify(json).replace(/\s+/g, '')
+  const hash = createHash('sha256');
+  hash.update(jsonstring);
+  const hexString = hash.digest('hex');
+
+  return hexString
 }
