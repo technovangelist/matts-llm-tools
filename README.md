@@ -1,15 +1,3 @@
 # matts-llm-tools
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.0.31. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+latestModelGetter takes a model name and pulls the latest version of the model from the Ollama registry. If you already have the latest version, it does nothing. This is much faster than just blindly pulling the model.
